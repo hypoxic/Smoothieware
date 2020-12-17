@@ -68,19 +68,7 @@ void Block::clear()
     is_ticking          = false;
     is_g123             = false;
     locked              = false;
-	move_axis           = 0;
-	s_value             = 0;
-#ifdef CNC
-    s_values[0]         = 0;
-    s_values[1]         = 0;
-    s_values[2]         = 0;
-    s_values[3]         = 0;
-    s_values[4]         = 0;
-    s_values[5]         = 0;
-    s_values[6]         = 0;
-    s_values[7]         = 0;
-#endif
-	s_count             = 1;
+    s_value             = 0.0F;
 
     total_move_ticks= 0;
     if(tick_info == nullptr) {
