@@ -204,7 +204,9 @@ void Robot::load_config()
 
     // default s value for laser
     this->s_value             = THEKERNEL->config->value(laser_module_default_power_checksum)->by_default(0.8F)->as_number();
-
+	this->s_values[0] = this->s_value;
+	this->s_count = 1;
+	
      // Make our Primary XYZ StepperMotors, and potentially A B C
     uint16_t const motor_checksums[][6] = {
         ACTUATOR_CHECKSUMS("alpha"), // X
@@ -1064,9 +1066,58 @@ void Robot::process_move(Gcode *gcode, enum MOTION_MODE_T motion_mode)
     }
 
     // S is modal When specified on a G0/1/2/3 command
-    if(gcode->has_letter('S')) s_value= gcode->get_value('S');
+	s_count = 1;
+	int index = gcode->index_of_letter('S');
+    if(index >= 0) {
+		s_value = gcode->get_value_at_index(index);
+		s_values[0] = s_value;
 
-    bool moved= false;
+#ifdef CNC
+		index = gcode->index_of_letter(':', index+1);
+		if(index >= 0) {
+			s_values[1] = gcode->get_value_at_index(index);
+			s_count = 2;
+
+			index = gcode->index_of_letter(':', index+1);
+			if(index >= 0) {
+				s_values[2] = gcode->get_value_at_index(index);
+				s_count = 3;
+
+				index = gcode->index_of_letter(':', index+1);
+				if(index >= 0) {
+					s_values[3] = gcode->get_value_at_index(index);
+					s_count = 4;
+
+					index = gcode->index_of_letter(':', index+1);
+					if(index >= 0) {
+						s_values[4] = gcode->get_value_at_index(index);
+						s_count = 5;
+
+						index = gcode->index_of_letter(':', index+1);
+						if(index >= 0) {
+							s_values[5] = gcode->get_value_at_index(index);
+							s_count = 6;
+
+							index = gcode->index_of_letter(':', index+1);
+							if(index >= 0) {
+								s_values[6] = gcode->get_value_at_index(index);
+								s_count = 7;
+
+								index = gcode->index_of_letter(':', index+1);
+								if(index >= 0) {
+									s_values[7] = gcode->get_value_at_index(index);
+									s_count = 8;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+#endif
+	}
+
+    bool moved = false;
 
     // Perform any physical actions
     switch(motion_mode) {
@@ -1365,7 +1416,7 @@ bool Robot::append_milestone(const float target[], float rate_mm_s)
     // Append the block to the planner
     // NOTE that distance here should be either the distance travelled by the XYZ axis, or the E mm travel if a solo E move
     // NOTE this call will bock until there is room in the block queue, on_idle will continue to be called
-    if(THEKERNEL->planner->append_block( actuator_pos, n_motors, rate_mm_s, distance, auxilliary_move ? nullptr : unit_vec, acceleration, s_value, is_g123)) {
+    if(THEKERNEL->planner->append_block( actuator_pos, n_motors, rate_mm_s, distance, auxilliary_move ? nullptr : unit_vec, acceleration, s_values, s_count, is_g123)) {
         // this is the new compensated machine position
         memcpy(this->compensated_machine_position, transformed_target, n_motors*sizeof(float));
         return true;
