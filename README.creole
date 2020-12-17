@@ -1,5 +1,12 @@
 Current build status: {{https://travis-ci.org/Smoothieware/Smoothieware.svg?branch=edge}}
 
+==Fork Changes for Cohesion3d
+I was curious in the changes to the software that Cohesion did to the smoothie firmware. After a post on their forums with the changes, I compared the binaries and merged these changes with the correct commit version. There was a const value on line 119 that was changed from 4000 to 2500 in the actual binary. Also, they saved the default config with DOS CR/LFs before compilation. 
+To build to match their binary, follow the Smoothie instructions and then run:
+{{{
+make clean
+make CNC=1 DISABLEMSD=1 AXIS=4 
+}}}
 ==Overview
 Smoothie is a free, opensource, high performance G-code interpreter and CNC controller written in Object-Oriented C++ for the LPC17xx micro-controller ( ARM Cortex M3 architecture ). It will run on a mBed, a LPCXpresso, a SmoothieBoard, R2C2 or any other LPC17xx-based board. The motion control part is a port of the awesome grbl.
 
