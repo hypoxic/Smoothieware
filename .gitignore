@@ -5,6 +5,8 @@
 *.elf
 *.hex
 *.map
+*.bak
+.gitignore
 mri.log
 gdb.txt
 deploy
